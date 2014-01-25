@@ -11,8 +11,15 @@ gem "bourbon"
 # For authorization (https://github.com/ryanb/cancan)
 gem "cancan"
 
-# HAML templating language (http://haml.info)
-gem "haml-rails" if yes?("Use HAML instead of ERB?")
+case ask("Choose Template Engine:", :limited_to => %w[erb haml slim])
+when "haml"
+  # HAML templating language (http://haml.info)
+  gem "haml-rails"
+when "slim"
+  # A lightweight templating engine (http://slim-lang.com)
+  gem "slim-rails"
+when "erb"
+end
 
 # Simple form builder (https://github.com/plataformatec/simple_form)
 gem "simple_form", git: "https://github.com/plataformatec/simple_form"
@@ -29,7 +36,7 @@ end
 gem_group :test do
   gem "rspec-rails"
   # Capybara for integration testing (https://github.com/jnicklas/capybara)
-  gem "capybara" 
+  gem "capybara"
   gem "capybara-webkit"
   # FactoryGirl instead of Rails fixtures (https://github.com/thoughtbot/factory_girl)
   gem "factory_girl_rails"
@@ -39,7 +46,6 @@ gem_group :production do
   # For Rails 4 deployment on Heroku
   gem "rails_12factor"
 end
-
 
 # Setting up foreman to deal with environment variables and services
 # https://github.com/ddollar/foreman
@@ -51,34 +57,25 @@ run "echo '.env' >> .gitignore"
 # We need this with foreman to see log output immediately
 run "echo 'STDOUT.sync = true' >> config/environments/development.rb"
 
-
-
 # Initialize guard
 # ==================================================
 run "bundle exec guard init rspec"
-
-
 
 # Initialize CanCan
 # ==================================================
 run "rails g cancan:ability"
 
-
-
 # Clean up Assets
 # ==================================================
 # Use SASS extension for application.css
 run "mv app/assets/stylesheets/application.css app/assets/stylesheets/application.css.scss"
-# Remove the require_tree directives from the SASS and JavaScript files. 
+# Remove the require_tree directives from the SASS and JavaScript files.
 # It's better design to import or require things manually.
 run "sed -i '' /require_tree/d app/assets/javascripts/application.js"
 run "sed -i '' /require_tree/d app/assets/stylesheets/application.css.scss"
 # Add bourbon to stylesheet file
 run "echo >> app/assets/stylesheets/application.css.scss"
 run "echo '@import \"bourbon\";' >>  app/assets/stylesheets/application.css.scss"
-
-
-
 
 # Bootstrap: install from https://github.com/twbs/bootstrap
 # Note: This is 3.0.0
@@ -93,7 +90,6 @@ if yes?("Download bootstrap?")
   run "rails g simple_form:install --bootstrap"
 end
 
-
 # Font-awesome: Install from http://fortawesome.github.io/Font-Awesome/
 # ==================================================
 if yes?("Download font-awesome?")
@@ -104,7 +100,6 @@ if yes?("Download font-awesome?")
   run "rm -rf font-awesome"
   run "echo '@import \"font-awesome\";' >>  app/assets/stylesheets/application.css.scss"
 end
-
 
 # Ignore rails doc files, Vim/Emacs swap files, .DS_Store, and more
 # ===================================================
@@ -123,7 +118,6 @@ doc/
 .secret
 .DS_Store
 EOF"
-
 
 # Git: Initialize
 # ==================================================
